@@ -1,51 +1,39 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
-import Home from "./pages/Home"
-import Product from "./pages/Product"
-import About from "./pages/About"
-import Contact from "./pages/Contact"
-import Cart from "./pages/Cart"
-import Navbar from "./components/Navbar"
-import axios from "axios"
-import { useEffect, useState } from "react"
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header.jsx';
+import Footer from './components/Footer.jsx';
+import HomePage from './pages/HomePage.jsx';
+import ProductDetailsPage from './pages/ProductDetailsPage.jsx';
+import CartPage from './pages/CartPage.jsx';
+import OrderPlacedPage from './pages/OrderPlacedPage.jsx';
 
 function App() {
+    const [cart, setCart] = useState([]);
 
-  const [localtions, setloactions] = useState()
+    const addToCart = (product) => {
+        setCart((prevCart) => [...prevCart, product]);
+    };
 
-  const location  = async() =>{
-    navigator.geolocation.getCurrentPosition(async pos => {
-      const {latitude, longitude} = pos.coords
-      console.log(latitude, longitude);
+    const clearCart = () => {
+        setCart([]);
+    };
 
-      const url =  `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-
-      try {
-        const location = await axios.get(url)
-        const exacrLocation = location.data.address
-        setloactions(exacrLocation)
-        
-      } catch (error) {
-        console.log(error);
-      }
-    })
-  }
-
-  useEffect(() =>{
-    location()
-  }, [])
-
-  return (
-    <BrowserRouter>
-    <Navbar localtions={localtions}/>
-    <Routes>
-      <Route path="/" element={<Home/>}/>
-      <Route path="/products" element={<Product/>}/>
-      <Route path="/about" element={<About/>}/>
-      <Route path="/contact" element={<Contact/>}/>
-      <Route path="/cart" element={<Cart/>}/>
-    </Routes>
-    </BrowserRouter>
-  )
+    return (
+        <Router>
+            <div className="font-lato">
+                <Header cartCount={cart.length} />
+                <main className="pt-20">
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/product/:id" element={<ProductDetailsPage onAddToCart={addToCart} />} />
+                        <Route path="/cart" element={<CartPage cartItems={cart} />} />
+                        <Route path="/order-placed" element={<OrderPlacedPage clearCart={clearCart} />} />
+                    </Routes>
+                </main>
+                <Footer />
+            </div>
+        </Router>
+    );
 }
 
-export default App
+export default App;
