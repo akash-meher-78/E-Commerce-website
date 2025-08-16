@@ -1,19 +1,22 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { IoCartOutline } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
-const ProductCard = ({ product }) => {
-    return (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300">
-            <Link to={`/product/${product.id}`}>
-                <img src={product.preview} alt={product.name} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                    <h3 className="text-lg font-semibold truncate">{product.name}</h3>
-                    <h4 className="text-gray-500 text-sm mt-1">{product.brand}</h4>
-                    <h2 className="text-teal-600 font-bold mt-2">Rs {product.price}</h2>
-                </div>
-            </Link>
-        </div>
-    );
-};
+const ProductCard = ({product}) => {
+    const navigate = useNavigate()
+    const {addToCart, cartItem} = useCart()
 
-export default ProductCard;
+       console.log(cartItem)
+    
+  return (
+    <div className='border relative border-gray-100 rounded-2xl cursor-pointer hover:scale-105 hover:shadow-2xl transition-all p-2 h-max'>
+      <img src={product.image} alt="" className='bg-gray-100 aspect-square' onClick={()=>navigate(`/products/${product.id}`)}/>
+      <h1 className='line-clamp-2 p-1 font-semibold'>{product.title}</h1>
+      <p className='my-1 text-lg text-gray-800 font-bold'>${product.price}</p>
+      <button onClick={()=>addToCart(product)} className='bg-red-500 px-3 py-2 text-lg rounded-md text-white w-full cursor-pointer flex gap-2 items-center justify-center font-semibold'><IoCartOutline className='w-6 h-6' /> Add to Cart</button>
+    </div>
+  )
+}
+
+export default ProductCard

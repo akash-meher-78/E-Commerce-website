@@ -1,39 +1,84 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header.jsx';
-import Footer from './components/Footer.jsx';
-import HomePage from './pages/HomePage.jsx';
-import ProductDetailsPage from './pages/ProductDetailsPage.jsx';
-import CartPage from './pages/CartPage.jsx';
-import OrderPlacedPage from './pages/OrderPlacedPage.jsx';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
 
-function App() {
-    const [cart, setCart] = useState([]);
+import Contact from "./pages/Contact";
+import Cart from "./pages/Cart";
+import Navbar from "./components/Navbar";
+import axios from "axios";
+import Footer from "./components/Footer";
+import SingleProduct from "./pages/SingleProduct";
+import CategoryProduct from "./pages/CategoryProduct";
+import { useCart } from "./context/CartContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
-    const addToCart = (product) => {
-        setCart((prevCart) => [...prevCart, product]);
-    };
+const App = () => {
+  const [location, setLocation] = useState();
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const { cartItem, setCartItem } = useCart();
 
-    const clearCart = () => {
-        setCart([]);
-    };
+  const getLocation = async () => {
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
 
-    return (
-        <Router>
-            <div className="font-lato">
-                <Header cartCount={cart.length} />
-                <main className="pt-20">
-                    <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/product/:id" element={<ProductDetailsPage onAddToCart={addToCart} />} />
-                        <Route path="/cart" element={<CartPage cartItems={cart} />} />
-                        <Route path="/order-placed" element={<OrderPlacedPage clearCart={clearCart} />} />
-                    </Routes>
-                </main>
-                <Footer />
-            </div>
-        </Router>
-    );
-}
+      const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
+
+      try {
+        const response = await axios.get(url);
+        const exactLocation = response.data;
+        setLocation(exactLocation);
+        setOpenDropdown(false);
+        console.log(exactLocation);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  };
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cartItem");
+    if (storedCart) {
+      setCartItem(JSON.parse(storedCart));
+    }
+  }, []);
+
+  // Save cart to local storage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("cartItem", JSON.stringify(cartItem));
+  }, [cartItem]);
+
+  return (
+    <BrowserRouter>
+      <Navbar
+        location={location}
+        getLocation={getLocation}
+        openDropdown={openDropdown}
+        setOpenDropdown={setOpenDropdown}
+      />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<SingleProduct />} />
+        <Route path="/category/:category" element={<CategoryProduct />} />
+        
+        <Route path="/contact" element={<Contact />} />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart location={location} getLocation={getLocation} />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+      <Footer />
+    </BrowserRouter>
+  );
+};
 
 export default App;
