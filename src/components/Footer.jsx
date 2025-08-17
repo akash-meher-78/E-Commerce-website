@@ -11,11 +11,11 @@ const Footer = () => {
         <div className='mb-6 md:mb-0'>
             <Link to='/'>
               {/* <img src={Logo} alt="" className='w-32'/> */}
-              <h1 className='text-red-500 text-2xl font-bold'>Shoplify</h1>
+              <h1 className='text-red-500 text-2xl font-bold'>E-Commerce</h1>
             </Link>
             <p className='mt-2 text-sm'>Powering Your World with the Best in Electronics.</p>
             <p className='mt-2 text-sm'>123 Electronics St, Style City, NY 10001</p>
-            <p className='text-sm'>Email: support@Shoplify</p>
+            <p className='text-sm'>Email: support@E-Commerce</p>
             <p className='text-sm'>Phone: (123) 123-2344810</p>
         </div>
         {/* customer service link */}

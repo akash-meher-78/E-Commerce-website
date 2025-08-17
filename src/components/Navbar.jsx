@@ -25,7 +25,7 @@ const Navbar = ({ location, getLocation, openDropdown, setOpenDropdown }) => {
         <div className="flex gap-7 items-center">
           <Link to={"/"}>
             <h1 className="font-extrabold text-3xl text-transparent bg-clip-text bg-white">
-              Shoplify
+              E-Commerce
             </h1>
           </Link>
 
